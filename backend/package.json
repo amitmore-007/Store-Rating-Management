@@ -8,8 +8,6 @@
     "dev": "nodemon server.js",
     "init-db": "node scripts/init-db.js",
     "build": "echo 'Backend build complete'",
-    "setup-db": "node scripts/setup-database.js",
-    "setup-db-prod": "node scripts/setup-database.js $DATABASE_URL",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

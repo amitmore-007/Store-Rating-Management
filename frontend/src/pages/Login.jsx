@@ -50,21 +50,21 @@ const Login = () => {
     {
       role: 'System Admin',
       email: 'admin@roxiler.com',
-      password: 'admin123',
+      password: 'Admin@123',
       icon: Shield,
       color: 'from-red-500 to-pink-500'
     },
     {
       role: 'Store Owner',
       email: 'alicew@example.com',
-      password: 'user123',
+      password: 'Store123',
       icon: Store,
       color: 'from-blue-500 to-indigo-500'
     },
     {
       role: 'Normal User',
       email: 'johnsmith@example.com',
-      password: 'store123',
+      password: 'User123',
       icon: User,
       color: 'from-green-500 to-emerald-500'
     }
