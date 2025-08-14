@@ -39,11 +39,11 @@ Roxiler is a cutting-edge store rating platform that empowers businesses and cus
 
 | Landing Page | Login Interface |
 |:---:|:---:|
-| ![Landing Page](./frontend/public/assets/screenshots/landing-page.png) | ![Login Page](./frontend/public/assets/screenshots/login-page.png) |
+| ![Landing Page](./frontend/public/assets/screenshots/landing.png) | ![Login Page](./frontend/public/assets/screenshots/Login.png) |
 
 | Sign Up Page | Dark Mode Login |
 |:---:|:---:|
-| ![Sign Up](./frontend/public/assets/screenshots/Register.png) | ![Dark Login](./frontend/public/assets/screenshots/login-dark.png) |
+| ![Sign Up](./frontend/public/assets/screenshots/Register.png) | ![Dark Login](./frontend/public/assets/screenshots/Login.png) |
 
 </div>
 
@@ -54,18 +54,17 @@ Roxiler is a cutting-edge store rating platform that empowers businesses and cus
 |:---:|:---:|
 | ![Admin Dashboard](./frontend/public/assets/screenshots/Admin-Dashboard.png) | ![User Management](./frontend/public/assets/screenshots/admin-users.png) |
 
-| Store Management | Analytics View |
+| Store Management |
 |:---:|:---:|
-| ![Store Management](./frontend/public/assets/screenshots/admin-stores.png) | ![Analytics](./frontend/public/assets/screenshots/admin-analytics.png) |
-
+| ![Store Management](./frontend/public/assets/screenshots/admin-stores.png) |
 </div>
 
 ### 👤 Customer Dashboard
 <div align="center">
 
-| Store Rating Interface | Customer Reviews |
+| Store Rating Interface | 
 |:---:|:---:|
-| ![User Dashboard](./frontend/public/assets/screenshots/User-Dashboard.png) | ![User Ratings](./frontend/public/assets/screenshots/User-Ratings.png) |
+| ![User Dashboard](./frontend/public/assets/screenshots/User-Dashboard.png) | 
 
 | Rating Submission | Rating History |
 |:---:|:---:|
@@ -78,7 +77,7 @@ Roxiler is a cutting-edge store rating platform that empowers businesses and cus
 
 | Store Overview | Customer Feedback |
 |:---:|:---:|
-| ![Store Dashboard](./frontend/public/assets/screenshots/StoreOwner-dashboard.png) |
+| ![Store Dashboard](./frontend/public/assets/screenshots/StoreOwner-Dashboard.png) |
 
 
 
