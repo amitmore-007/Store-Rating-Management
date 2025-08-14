@@ -8,7 +8,7 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:5173',
       'http://localhost:3000',
-      'https://your-frontend-app-name.onrender.com',
+      'https://store-rating-management-1.onrender.com',
       process.env.FRONTEND_URL
     ].filter(Boolean);
 
