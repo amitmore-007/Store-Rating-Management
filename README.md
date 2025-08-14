@@ -54,18 +54,18 @@ Roxiler is a cutting-edge store rating platform that empowers businesses and cus
 |:---:|:---:|
 | ![Admin Dashboard](./frontend/public/assets/screenshots/Admin-Dashboard.png) | ![User Management](./frontend/public/assets/screenshots/admin-users.png) |
 
-| Store Management | Analytics View |
-|:---:|:---:|
-| ![Store Management](./frontend/public/assets/screenshots/admin-stores.png) | ![Analytics](./frontend/public/assets/screenshots/admin-analytics.png) |
+| Store Management |
+|:---:|
+| ![Store Management](./frontend/public/assets/screenshots/admin-stores.png) |
 
 </div>
 
 ### 👤 Customer Dashboard
 <div align="center">
 
-| Store Rating Interface | Customer Reviews |
-|:---:|:---:|
-| ![User Dashboard](./frontend/public/assets/screenshots/User-Dashboard.png) | ![User Ratings](./frontend/public/assets/screenshots/user-ratings.png) |
+| Store Rating Interface |
+|:---:|
+| ![User Dashboard](./frontend/public/assets/screenshots/User-Dashboard.png) |
 
 | Rating Submission | Rating History |
 |:---:|:---:|
@@ -76,13 +76,9 @@ Roxiler is a cutting-edge store rating platform that empowers businesses and cus
 ### 🏪 Store Owner Dashboard
 <div align="center">
 
-| Store Overview | Customer Feedback |
-|:---:|:---:|
-| ![Store Dashboard](./frontend/public/assets/screenshots/StoreOwner-Dashboard.png) | ![Store Ratings](./frontend/public/assets/screenshots/store-ratings.png) |
-
-| Performance Analytics | Review Management |
-|:---:|:---:|
-| ![Store Analytics](./frontend/public/assets/screenshots/store-analytics.png) | ![Review Details](./frontend/public/assets/screenshots/review-details.png) |
+| Store Overview |
+|:---:|
+| ![Store Dashboard](./frontend/public/assets/screenshots/StoreOwner-Dashboard.png) |
 
 </div>
 
@@ -588,6 +584,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ by the Roxiler Team**
 
+[![GitHub stars](https://img.shields.io/github/stars/your-username/roxiler.svg?style=social&label=Star)](https://github.com/your-username/roxiler)
+[![GitHub forks](https://img.shields.io/github/forks/your-username/roxiler.svg?style=social&label=Fork)](https://github.com/your-username/roxiler/fork)
+
+</div>
 [![GitHub stars](https://img.shields.io/github/stars/your-username/roxiler.svg?style=social&label=Star)](https://github.com/your-username/roxiler)
 [![GitHub forks](https://img.shields.io/github/forks/your-username/roxiler.svg?style=social&label=Fork)](https://github.com/your-username/roxiler/fork)
 
