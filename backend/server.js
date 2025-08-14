@@ -153,3 +153,32 @@ app.post('/setup-database-temp', async (req, res) => {
     res.status(500).json({ message: 'Database setup failed', error: error.message });
   }
 });
+
+// One-time database setup endpoint
+app.post('/setup-database-one-time', async (req, res) => {
+  try {
+    console.log('🔄 One-time database setup initiated...');
+    
+    // Import and run the setup
+    const { setupDatabase } = require('./scripts/setup-database');
+    await setupDatabase();
+    
+    console.log('✅ Database setup completed successfully');
+    res.json({ 
+      success: true, 
+      message: 'Database setup completed successfully!',
+      credentials: {
+        admin: 'admin@roxiler.com / Admin@123',
+        user: 'johnsmith@example.com / User@123',
+        storeOwner: 'alicew@example.com / Store@123'
+      }
+    });
+  } catch (error) {
+    console.error('❌ Database setup failed:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Database setup failed', 
+      error: error.message 
+    });
+  }
+});
