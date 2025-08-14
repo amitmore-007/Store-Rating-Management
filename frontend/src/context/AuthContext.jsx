@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true)
       const data = await apiCall(API_ENDPOINTS.ME)
-      setUser(data.user)
+      setUser(data)
       setToken(savedToken)
     } catch (err) {
       localStorage.removeItem('token')

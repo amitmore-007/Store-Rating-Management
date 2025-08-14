@@ -36,7 +36,7 @@ const Login = () => {
     setLoading(true)
 
     try {
-      const result = await login(formData.email, formData.password)
+      await login(formData.email, formData.password)
       toast.success('Welcome back! 🎉')
       navigate('/dashboard')
     } catch (error) {
@@ -271,4 +271,3 @@ const Login = () => {
 
 export default Login
 
-         
