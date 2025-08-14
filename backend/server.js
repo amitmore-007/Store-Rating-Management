@@ -75,9 +75,81 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Database initialization function
+const initializeDatabase = async () => {
+  if (process.env.NODE_ENV === 'production' && process.env.INIT_DB === 'true') {
+    try {
+      console.log('🔄 Checking database tables...');
+      
+      // Check if users table exists
+      const tableCheck = await pool.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_schema = 'public' AND table_name = 'users'
+        );
+      `);
+      
+      if (!tableCheck.rows[0].exists) {
+        console.log('🚀 Initializing database tables...');
+        
+        // Run the setup script
+        const fs = require('fs');
+        const path = require('path');
+        const bcrypt = require('bcryptjs');
+        
+        const sqlFilePath = path.join(__dirname, 'scripts', 'init-db.sql');
+        let sql = fs.readFileSync(sqlFilePath, 'utf8');
+        
+        // Hash passwords
+        const hashedPassword = await bcrypt.hash('Admin@123', 10);
+        sql = sql.replace(/\$2a\$10\$1234567890123456789012u/g, hashedPassword);
+        
+        const client = await pool.connect();
+        await client.query(sql);
+        
+        // Update with different passwords
+        const hashedPasswordUser = await bcrypt.hash('User@123', 10);
+        const hashedPasswordStore = await bcrypt.hash('Store@123', 10);
+        
+        await client.query('UPDATE users SET password = $1 WHERE email = $2', [hashedPasswordUser, 'johnsmith@example.com']);
+        await client.query('UPDATE users SET password = $1 WHERE email = $2', [hashedPasswordStore, 'alicew@example.com']);
+        await client.query('UPDATE users SET password = $1 WHERE email = $2', [hashedPasswordUser, 'bob@example.com']);
+        await client.query('UPDATE users SET password = $1 WHERE email = $2', [hashedPasswordUser, 'sarah@example.com']);
+        
+        client.release();
+        console.log('✅ Database initialized successfully');
+      } else {
+        console.log('✅ Database tables already exist');
+      }
+    } catch (error) {
+      console.error('❌ Database initialization failed:', error);
+      // Don't exit - let the app continue in case tables exist but check failed
+    }
+  }
+};
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+// Initialize database before starting server
+(async () => {
+  await initializeDatabase();
+  
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+})();
+
+// Temporary setup endpoint (remove after setup)
+app.post('/setup-database-temp', async (req, res) => {
+  if (process.env.NODE_ENV !== 'production') {
+    return res.status(403).json({ message: 'Only available in production' });
+  }
+  
+  try {
+    await initializeDatabase();
+    res.json({ message: 'Database setup completed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Database setup failed', error: error.message });
+  }
 });
