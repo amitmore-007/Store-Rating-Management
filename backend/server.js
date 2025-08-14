@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { pool } = require('./config/database');
 const path = require('path');
+const fs = require('fs');
 const corsMiddleware = require('./middleware/cors');
 
 dotenv.config();
@@ -40,12 +41,27 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/user', require('./routes/user'));
 app.use('/api/store', require('./routes/store'));
 
-// Production static file serving (if needed)
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+// Serve static files from React app (only if dist folder exists)
+const frontendPath = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(frontendPath)) {
+  app.use(express.static(frontendPath));
   
+  // Catch all handler for React Router
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+    if (!req.url.startsWith('/api/')) {
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    }
+  });
+} else {
+  console.log('Frontend build not found. API-only mode enabled.');
+  
+  // Default route for API-only mode
+  app.get('/', (req, res) => {
+    res.json({ 
+      message: 'Store Rating Management API',
+      status: 'running',
+      endpoints: ['/api/auth', '/api/stores', '/api/ratings']
+    });
   });
 }
 
