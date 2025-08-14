@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import axios from 'axios'
+import { API_ENDPOINTS, apiCall } from '../utils/api'
 
 const AuthContext = createContext()
 
@@ -40,24 +40,29 @@ const validateAddress = (address) => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [token, setToken] = useState(null)
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      fetchUser()
-    } else {
-      setLoading(false)
-    }
+    checkAuth()
   }, [])
 
-  const fetchUser = async () => {
+  const checkAuth = async () => {
+    const savedToken = localStorage.getItem('token')
+    if (!savedToken) {
+      setLoading(false)
+      return
+    }
+
     try {
-      const response = await axios.get('/api/auth/me')
-      setUser(response.data)
-    } catch (error) {
+      setLoading(true)
+      const data = await apiCall(API_ENDPOINTS.ME)
+      setUser(data.user)
+      setToken(savedToken)
+    } catch (err) {
       localStorage.removeItem('token')
-      delete axios.defaults.headers.common['Authorization']
+      setUser(null)
+      setToken(null)
     } finally {
       setLoading(false)
     }
@@ -65,57 +70,60 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password })
-      const { token, user } = response.data
+      setLoading(true)
+      setError(null)
       
-      localStorage.setItem('token', token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      setUser(user)
-      
-      return { success: true }
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Login failed' 
-      }
+      const data = await apiCall(API_ENDPOINTS.LOGIN, {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      })
+
+      localStorage.setItem('token', data.token)
+      setUser(data.user)
+      setToken(data.token)
+    } catch (err) {
+      setError(err.message)
+      throw err
+    } finally {
+      setLoading(false)
     }
   }
 
   const register = async (userData) => {
     try {
-      // Frontend validation
-      const nameError = validateName(userData.name)
-      if (nameError) return { success: false, message: nameError }
+      setLoading(true)
+      setError(null)
+      
+      const data = await apiCall(API_ENDPOINTS.REGISTER, {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      })
 
-      const emailError = validateEmail(userData.email)
-      if (emailError) return { success: false, message: emailError }
-
-      const passwordError = validatePassword(userData.password)
-      if (passwordError) return { success: false, message: passwordError }
-
-      const addressError = validateAddress(userData.address)
-      if (addressError) return { success: false, message: addressError }
-
-      await axios.post('/api/auth/register', userData)
-      return { success: true }
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Registration failed' 
-      }
+      localStorage.setItem('token', data.token)
+      setUser(data.user)
+      setToken(data.token)
+      return data
+    } catch (err) {
+      setError(err.message)
+      throw err
+    } finally {
+      setLoading(false)
     }
   }
 
   const logout = () => {
     localStorage.removeItem('token')
-    delete axios.defaults.headers.common['Authorization']
     setUser(null)
+    setToken(null)
+    setError(null)
   }
 
   return (
     <AuthContext.Provider value={{
       user,
       loading,
+      error,
+      token,
       login,
       register,
       logout,
@@ -128,3 +136,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   )
 }
+

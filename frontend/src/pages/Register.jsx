@@ -89,18 +89,18 @@ const Register = () => {
 
     setLoading(true)
 
-    const result = await register({
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      address: formData.address
-    })
-    
-    if (result.success) {
+    try {
+      await register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        address: formData.address
+      })
+      
       toast.success('Account created successfully! 🎉')
       navigate('/dashboard')
-    } else {
-      toast.error(result.message)
+    } catch (error) {
+      toast.error(error.message || 'Registration failed')
     }
     
     setLoading(false)

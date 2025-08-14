@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
-import axios from 'axios'
+import { API_ENDPOINTS, apiCall } from '../../utils/api'
 import { useTheme } from '../../context/ThemeContext'
 import { 
   Store, 
@@ -33,8 +33,8 @@ const StoreOwnerDashboard = () => {
   const fetchMyStores = async () => {
     setLoading(true)
     try {
-      const response = await axios.get('/api/store/my-stores')
-      setStores(response.data)
+      const response = await apiCall(API_ENDPOINTS.STORE_MY_STORES)
+      setStores(response)
     } catch (error) {
       toast.error('Failed to fetch your stores')
     }
@@ -44,8 +44,8 @@ const StoreOwnerDashboard = () => {
   const fetchStoreRatings = async (storeId) => {
     setLoading(true)
     try {
-      const response = await axios.get(`/api/store/${storeId}/ratings`)
-      setStoreRatings(response.data)
+      const response = await apiCall(API_ENDPOINTS.STORE_RATINGS(storeId))
+      setStoreRatings(response)
       setSelectedStore(storeId)
     } catch (error) {
       toast.error('Failed to fetch store ratings')
@@ -404,4 +404,3 @@ const StoreOwnerDashboard = () => {
 }
 
 export default StoreOwnerDashboard
-                     

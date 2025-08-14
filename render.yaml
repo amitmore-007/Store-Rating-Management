@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: roxiler-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_USER
+        fromDatabase:
+          name: roxiler-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: roxiler-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: roxiler-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: roxiler-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: roxiler-db
+          property: database
+
+  - type: web
+    name: roxiler-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://roxiler-backend.onrender.com
+
+databases:
+  - name: roxiler-db
+    plan: free

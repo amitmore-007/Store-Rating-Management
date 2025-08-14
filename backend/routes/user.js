@@ -1,13 +1,13 @@
 const express = require('express');
 const { pool } = require('../config/database');
-const { authenticateToken, requireRole } = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Protect all user routes
 router.use(authenticateToken);
 
-// Get all stores for rating
+// Get all stores with user's rating if exists
 router.get('/stores', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -20,7 +20,7 @@ router.get('/stores', async (req, res) => {
       LEFT JOIN ratings r ON s.id = r.store_id
       LEFT JOIN ratings ur ON s.id = ur.store_id AND ur.user_id = $1
       GROUP BY s.id, ur.rating
-      ORDER BY s.name
+      ORDER BY s.created_at DESC
     `, [req.user.id]);
     
     res.json(result.rows);
@@ -36,35 +36,38 @@ router.post('/ratings', async (req, res) => {
     const { storeId, rating, comment } = req.body;
     const userId = req.user.id;
 
-    if (rating < 1 || rating > 5) {
-      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    // Validation
+    if (!storeId || !rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: 'Valid store ID and rating (1-5) are required' });
+    }
+
+    // Check if store exists
+    const storeCheck = await pool.query('SELECT id FROM stores WHERE id = $1', [storeId]);
+    if (storeCheck.rows.length === 0) {
+      return res.status(404).json({ message: 'Store not found' });
     }
 
     // Check if user already rated this store
     const existingRating = await pool.query(
-      'SELECT * FROM ratings WHERE user_id = $1 AND store_id = $2',
+      'SELECT id FROM ratings WHERE user_id = $1 AND store_id = $2',
       [userId, storeId]
     );
 
-    let result;
     if (existingRating.rows.length > 0) {
       // Update existing rating
-      result = await pool.query(
-        'UPDATE ratings SET rating = $1, comment = $2 WHERE user_id = $3 AND store_id = $4 RETURNING *',
-        [rating, comment, userId, storeId]
+      await pool.query(
+        'UPDATE ratings SET rating = $1, comment = $2, created_at = CURRENT_TIMESTAMP WHERE user_id = $3 AND store_id = $4',
+        [rating, comment || null, userId, storeId]
       );
+      res.json({ message: 'Rating updated successfully' });
     } else {
-      // Insert new rating
-      result = await pool.query(
-        'INSERT INTO ratings (user_id, store_id, rating, comment) VALUES ($1, $2, $3, $4) RETURNING *',
-        [userId, storeId, rating, comment]
+      // Create new rating
+      await pool.query(
+        'INSERT INTO ratings (user_id, store_id, rating, comment) VALUES ($1, $2, $3, $4)',
+        [userId, storeId, rating, comment || null]
       );
+      res.json({ message: 'Rating submitted successfully' });
     }
-
-    res.json({
-      message: 'Rating submitted successfully',
-      rating: result.rows[0]
-    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

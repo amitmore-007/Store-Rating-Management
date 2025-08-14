@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
-import axios from 'axios'
+import { API_ENDPOINTS, apiCall } from '../../utils/api'
 import { useTheme } from '../../context/ThemeContext'
 import { 
   BarChart3, 
@@ -67,8 +67,8 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get('/api/admin/dashboard')
-      setStats(response.data)
+      const response = await apiCall(API_ENDPOINTS.ADMIN_DASHBOARD)
+      setStats(response)
       await fetchActivityData()
     } catch (error) {
       toast.error('Failed to fetch dashboard stats')
@@ -77,46 +77,55 @@ const AdminDashboard = () => {
 
   const fetchActivityData = async () => {
     try {
-      const response = await axios.get('/api/admin/activity')
-      const data = response.data
+      const response = await apiCall(API_ENDPOINTS.ADMIN_ACTIVITY)
+      const data = response
 
-      // Process daily stats for chart
-      const dailyStats = data.dailyStats.map(day => ({
-        date: new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      console.log('Server time:', data.serverTime);
+      console.log('Server current date:', data.currentDate);
+      console.log('Client time:', new Date().toISOString());
+      console.log('Raw daily stats from server:', data.dailyStats);
+
+      // Process daily stats for chart - use data directly from backend
+      const dailyStats = data.dailyStats ? data.dailyStats.map(day => ({
+        date: day.date || new Date().toISOString().split('T')[0],
+        dateLabel: day.dateLabel || 'Unknown',
         users: parseInt(day.users) || 0,
         stores: parseInt(day.stores) || 0,
         ratings: parseInt(day.ratings) || 0,
+        isToday: day.isToday || false,
         total: (parseInt(day.users) || 0) + (parseInt(day.stores) || 0) + (parseInt(day.ratings) || 0)
-      }))
+      })) : []
+
+      console.log('Processed daily stats:', dailyStats);
 
       // Process monthly growth
       const monthlyGrowth = {
         users: { 
-          current: data.monthlyGrowth.current_users || 0, 
-          growth: data.monthlyGrowth.user_growth || 0 
+          current: data.monthlyGrowth?.current_users || 0, 
+          growth: data.monthlyGrowth?.user_growth || 0 
         },
         stores: { 
-          current: data.monthlyGrowth.current_stores || 0, 
-          growth: data.monthlyGrowth.store_growth || 0 
+          current: data.monthlyGrowth?.current_stores || 0, 
+          growth: data.monthlyGrowth?.store_growth || 0 
         },
         ratings: { 
-          current: data.monthlyGrowth.current_ratings || 0, 
-          growth: data.monthlyGrowth.rating_growth || 0 
+          current: data.monthlyGrowth?.current_ratings || 0, 
+          growth: data.monthlyGrowth?.rating_growth || 0 
         }
       }
 
       // Process recent activity
-      const recentActivity = data.recentActivity.map(activity => ({
+      const recentActivity = data.recentActivity ? data.recentActivity.map(activity => ({
         ...activity,
         icon: activity.type
-      }))
+      })) : []
 
       // Process platform health
       const platformHealth = {
-        userEngagement: Math.round(data.platformHealth.user_engagement || 0),
-        storeActivity: Math.round(data.platformHealth.store_activity || 0),
-        ratingSatisfaction: Math.round(data.platformHealth.rating_satisfaction || 0),
-        systemPerformance: Math.round(data.platformHealth.system_performance || 85)
+        userEngagement: Math.round(data.platformHealth?.user_engagement || 0),
+        storeActivity: Math.round(data.platformHealth?.store_activity || 0),
+        ratingSatisfaction: Math.round(data.platformHealth?.rating_satisfaction || 0),
+        systemPerformance: Math.round(data.platformHealth?.system_performance || 85)
       }
 
       setActivityData({
@@ -130,9 +139,24 @@ const AdminDashboard = () => {
 
     } catch (error) {
       console.error('Failed to fetch activity data:', error)
-      // Fallback to empty data
+      // Fallback to empty data with proper structure
+      const fallbackDailyStats = []
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date()
+        date.setDate(date.getDate() - i)
+        fallbackDailyStats.push({
+          date: date.toISOString().split('T')[0],
+          dateLabel: i === 0 ? 'Today' : i === 1 ? 'Yesterday' : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          users: 0,
+          stores: 0,
+          ratings: 0,
+          isToday: i === 0,
+          total: 0
+        })
+      }
+      
       setActivityData({
-        dailyStats: [],
+        dailyStats: fallbackDailyStats,
         monthlyGrowth: { users: { current: 0, growth: 0 }, stores: { current: 0, growth: 0 } },
         recentActivity: [],
         topStores: [],
@@ -144,8 +168,8 @@ const AdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/api/admin/users')
-      setUsers(response.data)
+      const response = await apiCall(API_ENDPOINTS.ADMIN_USERS)
+      setUsers(response)
     } catch (error) {
       toast.error('Failed to fetch users')
     }
@@ -153,8 +177,8 @@ const AdminDashboard = () => {
 
   const fetchStores = async () => {
     try {
-      const response = await axios.get('/api/admin/stores')
-      setStores(response.data)
+      const response = await apiCall(API_ENDPOINTS.ADMIN_STORES)
+      setStores(response)
     } catch (error) {
       toast.error('Failed to fetch stores')
     }
@@ -164,14 +188,17 @@ const AdminDashboard = () => {
     e.preventDefault()
     setLoading(true)
     try {
-      await axios.post('/api/admin/users', userForm)
+      await apiCall(API_ENDPOINTS.ADMIN_USERS, {
+        method: 'POST',
+        body: JSON.stringify(userForm)
+      })
       setSuccessMessage(`User "${userForm.name}" has been successfully created! They can now access the platform with their credentials.`)
       setSuccessType('user')
       setShowSuccessModal(true)
       setUserForm({ name: '', email: '', password: '', address: '', role: 'normal_user' })
       if (activeTab === 'users') fetchUsers()
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create user')
+      toast.error(error.message || 'Failed to create user')
     }
     setLoading(false)
   }
@@ -180,14 +207,17 @@ const AdminDashboard = () => {
     e.preventDefault()
     setLoading(true)
     try {
-      await axios.post('/api/admin/stores', storeForm)
+      await apiCall(API_ENDPOINTS.ADMIN_STORES, {
+        method: 'POST',
+        body: JSON.stringify(storeForm)
+      })
       setSuccessMessage(`Store "${storeForm.name}" has been successfully created! It's now available for customers to rate and review.`)
       setSuccessType('store')
       setShowSuccessModal(true)
       setStoreForm({ name: '', email: '', address: '', ownerEmail: '' })
       if (activeTab === 'stores') fetchStores()
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create store')
+      toast.error(error.message || 'Failed to create store')
     }
     setLoading(false)
   }
@@ -371,33 +401,35 @@ const AdminDashboard = () => {
                       </div>
                       
                       <div className="h-64 bg-white/5 rounded-2xl p-4 border border-white/10">
-                        <div className="h-full flex items-end justify-between space-x-2">
+                        <div className="h-full flex items-end justify-between space-x-1">
                           {activityData.dailyStats.map((day, index) => {
                             const maxValue = Math.max(
-                              ...activityData.dailyStats.map(d => Math.max(d.users, d.stores, d.total/2)),
-                              5 // Minimum scale
+                              ...activityData.dailyStats.map(d => Math.max(d.users, d.stores, d.ratings)),
+                              1 // Minimum scale
                             )
                             
                             const userHeight = Math.max((day.users / maxValue) * 100, 2)
                             const storeHeight = Math.max((day.stores / maxValue) * 100, 2)
-                            const ratingHeight = Math.max(((day.total - day.users - day.stores) / maxValue) * 100, 2)
+                            const ratingHeight = Math.max((day.ratings / maxValue) * 100, 2)
                             
                             return (
                               <div
                                 key={day.date}
-                                className="flex-1 flex flex-col items-center space-y-2 group"
+                                className="flex-1 flex flex-col items-center space-y-2 group relative"
                               >
                                 {/* Chart Bars */}
-                                <div className="w-full flex justify-center space-x-1 items-end h-48">
+                                <div className="w-full flex justify-center space-x-0.5 items-end h-48">
                                   {/* Users Bar */}
                                   <motion.div
                                     initial={{ height: 0 }}
                                     animate={{ height: `${userHeight}%` }}
                                     transition={{ delay: index * 0.1, duration: 0.6 }}
-                                    className="w-6 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-md min-h-[4px] relative group/bar"
+                                    className={`w-4 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm min-h-[2px] relative group/bar ${
+                                      day.isToday ? 'ring-2 ring-white/30' : ''
+                                    }`}
                                     style={{ height: `${userHeight}%` }}
                                   >
-                                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap">
+                                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-20">
                                       Users: {day.users}
                                     </div>
                                   </motion.div>
@@ -407,10 +439,12 @@ const AdminDashboard = () => {
                                     initial={{ height: 0 }}
                                     animate={{ height: `${storeHeight}%` }}
                                     transition={{ delay: index * 0.1 + 0.1, duration: 0.6 }}
-                                    className="w-6 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t-md min-h-[4px] relative group/bar"
+                                    className={`w-4 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t-sm min-h-[2px] relative group/bar ${
+                                      day.isToday ? 'ring-2 ring-white/30' : ''
+                                    }`}
                                     style={{ height: `${storeHeight}%` }}
                                   >
-                                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap">
+                                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-20">
                                       Stores: {day.stores}
                                     </div>
                                   </motion.div>
@@ -420,28 +454,36 @@ const AdminDashboard = () => {
                                     initial={{ height: 0 }}
                                     animate={{ height: `${ratingHeight}%` }}
                                     transition={{ delay: index * 0.1 + 0.2, duration: 0.6 }}
-                                    className="w-6 bg-gradient-to-t from-yellow-600 to-yellow-400 rounded-t-md min-h-[4px] relative group/bar"
+                                    className={`w-4 bg-gradient-to-t from-yellow-600 to-yellow-400 rounded-t-sm min-h-[2px] relative group/bar ${
+                                      day.isToday ? 'ring-2 ring-white/30' : ''
+                                    }`}
                                     style={{ height: `${ratingHeight}%` }}
                                   >
-                                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap">
+                                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap z-20">
                                       Ratings: {day.ratings}
                                     </div>
                                   </motion.div>
                                 </div>
                                 
                                 {/* Date Label */}
-                                <div className="text-xs text-gray-400 text-center">
-                                  {day.date}
+                                <div className={`text-xs text-center max-w-full truncate ${
+                                  day.isToday ? 'text-white font-semibold' : 'text-gray-400'
+                                }`}>
+                                  {day.dateLabel}
                                 </div>
+                                
+                                {/* Today indicator */}
+                                {day.isToday && (
+                                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                                )}
                                 
                                 {/* Hover Card */}
                                 <motion.div
                                   initial={{ opacity: 0, scale: 0.8 }}
-                                  whileHover={{ opacity: 1, scale: 1 }}
-                                  className="absolute bottom-full mb-2 p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 z-10"
+                                  className="absolute bottom-full mb-4 p-3 bg-black/90 backdrop-blur-md border border-white/20 rounded-xl shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 z-30 min-w-max"
                                 >
                                   <div className="text-xs text-white space-y-1">
-                                    <p className="font-semibold">{day.date}</p>
+                                    <p className="font-semibold text-center">{day.dateLabel}</p>
                                     <div className="flex items-center space-x-2">
                                       <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                                       <span>Users: {day.users}</span>
@@ -452,7 +494,10 @@ const AdminDashboard = () => {
                                     </div>
                                     <div className="flex items-center space-x-2">
                                       <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                                      <span>Ratings: {Math.max(day.total - day.users - day.stores, 0)}</span>
+                                      <span>Ratings: {day.ratings}</span>
+                                    </div>
+                                    <div className="border-t border-white/20 pt-1 mt-1">
+                                      <span className="font-medium">Total: {day.users + day.stores + day.ratings}</span>
                                     </div>
                                   </div>
                                 </motion.div>
@@ -463,15 +508,15 @@ const AdminDashboard = () => {
                         
                         {/* Y-axis labels */}
                         <div className="absolute left-0 top-0 h-48 flex flex-col justify-between text-xs text-gray-400 -ml-8">
-                          <span>High</span>
-                          <span>Med</span>
-                          <span>Low</span>
+                          <span>{Math.max(...activityData.dailyStats.map(d => Math.max(d.users, d.stores, d.ratings)), 1)}</span>
+                          <span>{Math.ceil(Math.max(...activityData.dailyStats.map(d => Math.max(d.users, d.stores, d.ratings)), 1) * 0.67)}</span>
+                          <span>{Math.ceil(Math.max(...activityData.dailyStats.map(d => Math.max(d.users, d.stores, d.ratings)), 1) * 0.33)}</span>
                           <span>0</span>
                         </div>
                       </div>
                       
                       <div className="text-center text-sm text-gray-400">
-                        Daily activity over the last 7 days (Real Data)
+                        Activity over the last 7 days • <span className="text-white font-medium">Today ({new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})</span> is highlighted
                       </div>
                     </div>
                   ) : (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
-import axios from 'axios'
+import { API_ENDPOINTS, apiCall } from '../../utils/api'
 import { useTheme } from '../../context/ThemeContext'
 import { 
   Store, 
@@ -39,8 +39,8 @@ const UserDashboard = () => {
 
   const fetchStores = async () => {
     try {
-      const response = await axios.get('/api/user/stores')
-      setStores(response.data)
+      const response = await apiCall(API_ENDPOINTS.USER_STORES)
+      setStores(response)
     } catch (error) {
       toast.error('Failed to fetch stores')
     }
@@ -48,8 +48,8 @@ const UserDashboard = () => {
 
   const fetchMyRatings = async () => {
     try {
-      const response = await axios.get('/api/user/my-ratings')
-      setMyRatings(response.data)
+      const response = await apiCall(API_ENDPOINTS.USER_MY_RATINGS)
+      setMyRatings(response)
     } catch (error) {
       toast.error('Failed to fetch your ratings')
     }
@@ -69,10 +69,13 @@ const UserDashboard = () => {
 
     setLoading(true)
     try {
-      await axios.post('/api/user/ratings', {
-        storeId: selectedStore.id,
-        rating,
-        comment
+      await apiCall(API_ENDPOINTS.USER_RATINGS, {
+        method: 'POST',
+        body: JSON.stringify({
+          storeId: selectedStore.id,
+          rating,
+          comment
+        })
       })
       setShowSuccessModal(true)
       setSelectedStore(null)
@@ -81,7 +84,7 @@ const UserDashboard = () => {
       fetchStores()
       if (activeTab === 'my-ratings') fetchMyRatings()
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to submit rating')
+      toast.error(error.message || 'Failed to submit rating')
     }
     setLoading(false)
   }

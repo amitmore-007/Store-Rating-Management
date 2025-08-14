@@ -1,12 +1,12 @@
 const express = require('express');
 const { pool } = require('../config/database');
-const { authenticateToken, requireRole } = require('../middleware/auth');
+const { authenticateToken, requireStoreOwner } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Protect all store routes
 router.use(authenticateToken);
-router.use(requireRole(['store_owner', 'system_admin']));
+router.use(requireStoreOwner);
 
 // Get store owner's stores
 router.get('/my-stores', async (req, res) => {

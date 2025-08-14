@@ -186,7 +186,7 @@ npm run dev
 
 ### 🎉 Access the Application
 
-- **Frontend:** [http://localhost:3000](http://localhost:3000)
+- **Frontend:** [http://localhost:5173](http://localhost:5173)
 - **Backend API:** [http://localhost:5000](http://localhost:5000)
 
 ---
@@ -384,7 +384,7 @@ npm run dev          # Frontend (separate terminal)
 
 # 3. Verify services
 curl http://localhost:5000/api/auth/me
-curl http://localhost:3000
+curl http://localhost:5173
 ```
 
 #### **Phase 2: Admin Testing**
@@ -578,17 +578,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-<div align="center">
 
-### 🌟 Star this project if you found it helpful!
-
-**Built with ❤️ by the Roxiler Team**
-
-[![GitHub stars](https://img.shields.io/github/stars/your-username/roxiler.svg?style=social&label=Star)](https://github.com/your-username/roxiler)
-[![GitHub forks](https://img.shields.io/github/forks/your-username/roxiler.svg?style=social&label=Fork)](https://github.com/your-username/roxiler/fork)
-
-</div>
-[![GitHub stars](https://img.shields.io/github/stars/your-username/roxiler.svg?style=social&label=Star)](https://github.com/your-username/roxiler)
-[![GitHub forks](https://img.shields.io/github/forks/your-username/roxiler.svg?style=social&label=Fork)](https://github.com/your-username/roxiler/fork)
-
-</div>
