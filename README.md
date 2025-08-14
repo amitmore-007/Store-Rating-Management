@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Roxiler Logo](./frontend/public/assets/logo.png)
+
 
 **A modern, full-stack web application for comprehensive store rating and management with intelligent role-based access control**
 
@@ -51,11 +51,11 @@ Roxiler is a cutting-edge store rating platform that empowers businesses and cus
 <div align="center">
 
 | Admin Overview | User Management |
-|:---:|:---:|
+
 | ![Admin Dashboard](./frontend/public/assets/screenshots/Admin-Dashboard.png) | ![User Management](./frontend/public/assets/screenshots/admin-users.png) |
 
 | Store Management |
-|:---:|:---:|
+
 | ![Store Management](./frontend/public/assets/screenshots/admin-stores.png) |
 </div>
 
@@ -63,11 +63,10 @@ Roxiler is a cutting-edge store rating platform that empowers businesses and cus
 <div align="center">
 
 | Store Rating Interface | 
-|:---:|:---:|
 | ![User Dashboard](./frontend/public/assets/screenshots/User-Dashboard.png) | 
 
 | Rating Submission | Rating History |
-|:---:|:---:|
+
 | ![Rate Store](./frontend/public/assets/screenshots/rate-store.png) | ![My Ratings](./frontend/public/assets/screenshots/my-ratings.png) |
 
 </div>
@@ -75,8 +74,8 @@ Roxiler is a cutting-edge store rating platform that empowers businesses and cus
 ### 🏪 Store Owner Dashboard
 <div align="center">
 
-| Store Overview | Customer Feedback |
-|:---:|:---:|
+| Store Overview | 
+
 | ![Store Dashboard](./frontend/public/assets/screenshots/StoreOwner-Dashboard.png) |
 
 
