@@ -51,22 +51,24 @@ Roxiler is a cutting-edge store rating platform that empowers businesses and cus
 <div align="center">
 
 | Admin Overview | User Management |
-
+|:---:|:---:|
 | ![Admin Dashboard](./frontend/public/assets/screenshots/Admin-Dashboard.png) | ![User Management](./frontend/public/assets/screenshots/admin-users.png) |
 
-| Store Management |
+| Store Management | Analytics View |
+|:---:|:---:|
+| ![Store Management](./frontend/public/assets/screenshots/admin-stores.png) | ![Analytics](./frontend/public/assets/screenshots/admin-analytics.png) |
 
-| ![Store Management](./frontend/public/assets/screenshots/admin-stores.png) |
 </div>
 
 ### 👤 Customer Dashboard
 <div align="center">
 
-| Store Rating Interface | 
-| ![User Dashboard](./frontend/public/assets/screenshots/User-Dashboard.png) | 
+| Store Rating Interface | Customer Reviews |
+|:---:|:---:|
+| ![User Dashboard](./frontend/public/assets/screenshots/User-Dashboard.png) | ![User Ratings](./frontend/public/assets/screenshots/user-ratings.png) |
 
 | Rating Submission | Rating History |
-
+|:---:|:---:|
 | ![Rate Store](./frontend/public/assets/screenshots/rate-store.png) | ![My Ratings](./frontend/public/assets/screenshots/my-ratings.png) |
 
 </div>
@@ -74,11 +76,13 @@ Roxiler is a cutting-edge store rating platform that empowers businesses and cus
 ### 🏪 Store Owner Dashboard
 <div align="center">
 
-| Store Overview | 
+| Store Overview | Customer Feedback |
+|:---:|:---:|
+| ![Store Dashboard](./frontend/public/assets/screenshots/StoreOwner-Dashboard.png) | ![Store Ratings](./frontend/public/assets/screenshots/store-ratings.png) |
 
-| ![Store Dashboard](./frontend/public/assets/screenshots/StoreOwner-Dashboard.png) |
-
-
+| Performance Analytics | Review Management |
+|:---:|:---:|
+| ![Store Analytics](./frontend/public/assets/screenshots/store-analytics.png) | ![Review Details](./frontend/public/assets/screenshots/review-details.png) |
 
 </div>
 
