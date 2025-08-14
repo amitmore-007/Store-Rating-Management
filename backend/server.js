@@ -60,7 +60,7 @@ if (fs.existsSync(frontendPath)) {
     res.json({ 
       message: 'Store Rating Management API',
       status: 'running',
-      endpoints: ['/api/auth', '/api/stores', '/api/ratings']
+      endpoints: ['/api/auth', '/api/stores', '/api/ratings', '/api/admin']
     });
   });
 }
